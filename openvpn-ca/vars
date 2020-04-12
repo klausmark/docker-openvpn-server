@@ -205,7 +205,7 @@ set_var EASYRSA_CERT_EXPIRE	3560
 # This is best left alone. Interactively you will set this manually, and BATCH
 # callers are expected to set this themselves.
 
-#set_var EASYRSA_REQ_CN		"ChangeMe"
+# set_var EASYRSA_REQ_CN		"OpenVPN-CA"
 
 # Cryptographic digest to use.
 # Do not change this default unless you understand the security implications.

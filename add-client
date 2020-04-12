@@ -2,6 +2,6 @@
 set -e
 
 cd /openvpn-ca
-./easyrsa --batch gen-req $1 nopass
-./easyrsa --batch sign-req $1
+./easyrsa --batch --req-cn=$1 gen-req $1 nopass
+./easyrsa --batch --req-cn=$1 sign-req client $1
 ./gen-conf.sh $1

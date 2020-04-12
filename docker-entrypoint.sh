@@ -11,20 +11,29 @@ echo "To generate client cert use:"
 echo ""
 echo ""
 
-if [ ! -d "/openvpn-ca/pki" ]; then
-    echo "First time run:"
-    read -p "Please enter server name (eg. server): " SERVERNAME
-    read -p "Please enter server url (server.example.com): " SERVERURL
-    cd /openvpn-ca
-    ./easyrsa --batch init-pki
-    ./easyrsa --batch build-ca nopass
-    ./easyrsa --batch gen-req $SERVERNAME nopass
-    ./easyrsa --batch sign-req server $SERVERNAME
-    ./easyrsa --batch gen-dh
-    /usr/sbin/openvpn --genkey --secret ta.key
-fi
-
 if [ "$1" = "openvpn" ]; then
+    if [ ! -d "/openvpn-ca/pki" ]; then
+        echo "First time run:"
+        if [ -z $2 ]; then
+            read -p "Please enter server name (eg. server): " SERVERNAME
+        else
+          SERVERNAME=$2
+        fi
+        if [ -z $3 ]; then
+            read -p "Please enter server url (server.example.com): " SERVERURL
+        else
+            SERVERURL=$3
+        fi
+        cd /openvpn-ca
+        ./easyrsa --batch init-pki
+        ./easyrsa --batch --req-cn=OpenVPN-CA build-ca nopass
+        ./easyrsa --batch --req-cn=$SERVERNAME gen-req $SERVERNAME nopass
+        ./easyrsa --batch --req-cn=$SERVERNAME sign-req server $SERVERNAME
+        ./easyrsa --batch gen-dh
+        /usr/sbin/openvpn --genkey --secret ta.key
+        echo "remote $SERVERURL" >> client.conf
+    fi
+
     echo "Starting openvpn server"
     exec /usr/sbin/openvpn /etc/openvpn/server.conf
 fi
